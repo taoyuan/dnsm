@@ -1,7 +1,7 @@
-coverage/
-node_modules/
+coverage
+node_modules
 npm-debug.log
 .nyc_output
-.idea/
+.idea
 *.iml
-lib/
+lib
