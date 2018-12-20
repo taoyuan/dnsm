@@ -5,6 +5,7 @@ import {createProvider} from "./providers";
 import {IPer} from "./iper";
 import {Logger} from "./logger";
 import {aggregate, authFromEnv} from "./utils";
+import {Config} from "./config";
 
 const ipser = new IPer();
 
@@ -133,3 +134,38 @@ export class Executor {
   }
 
 }
+
+export async function execute(action: string, args, opts, logger) {
+  if (opts.conf) {
+    logger.debug('execute with config:', opts.conf);
+    await executeWithConfig(action, args, opts, logger);
+  } else if (args.provider) {
+    logger.debug('execute with provider:', args.provider);
+    await executeWithProvider(action, args, opts, logger);
+  } else {
+    throw new Error('no provider or config file provided');
+  }
+}
+
+async function executeWithProvider(action: string, args, opts, logger) {
+  const {provider, domains} = args;
+  if (!domains || !domains.length) {
+    throw new Error('no domains provided')
+  }
+
+  await Executor.execute(provider, action, domains, opts, logger);
+}
+
+async function executeWithConfig(action: string, args, opts, logger) {
+  const {conf} = opts;
+  const entries = Config.load(conf);
+  if (!_.isPlainObject(entries)) {
+    throw new Error(`config content in "${conf}" should be a plain object.`);
+  }
+  const providers = Object.keys(entries);
+
+  for (const provider of providers) if (entries[provider]) {
+    await Executor.execute(provider, action, entries[provider], opts, logger);
+  }
+}
+
