@@ -9,11 +9,11 @@ export class IPer {
     this._ttl = ttl || 60;
   }
 
-  async ip() {
+  async ip(uri?: string) {
     if (this._ip && (Date.now() - this._timestamp) < this._ttl) {
       return this._ip;
     }
-    this._ip = await ipily();
+    this._ip = await ipily(uri);
     this._timestamp = Date.now();
     return this._ip;
   }

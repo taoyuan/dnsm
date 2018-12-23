@@ -1,13 +1,14 @@
 import _ = require('lodash');
 import psl = require('psl');
-import {Provider, ProviderOptions, Record, RecordData, RecordFilter} from "./provider";
-import {createProvider} from "./providers";
+import {Provider, ProviderOptions, Record, RecordData, RecordFilter, createProvider} from "./provider";
 import {IPer} from "./iper";
 import {Logger} from "./logger";
 import {aggregate, authFromEnv} from "./utils";
 import {Config} from "./config";
 
-const ipser = new IPer();
+const iper = new IPer();
+
+export type ExecutorOptions = ProviderOptions & ExecuteParams;
 
 export interface ExecuteParams {
   type?: string;
@@ -18,6 +19,8 @@ export interface ExecuteParams {
 }
 
 export class Executor {
+  static _endpoint: string;
+
   protected _provider: Provider;
   protected _ready: Promise<void>;
 
@@ -26,9 +29,21 @@ export class Executor {
     this._ready = provider.authenticate();
   }
 
-  static async execute(provider: string, action: string, domains: string | string[], opts: ProviderOptions & ExecuteParams, logger: Logger) {
+  static endpoint(endpoint?: string) {
+    if (endpoint !== undefined) {
+      this._endpoint = endpoint;
+    }
+    return this._endpoint;
+  }
+
+  // for test
+  static createProvider(provider: string, domain: string, opts: ProviderOptions, logger?: Logger): Provider {
+    return createProvider(provider, domain, opts, logger);
+  }
+
+  static async execute(provider: string, action: string, domains: string | string[], opts: ExecutorOptions, logger?: Logger) {
     opts = _.defaults(opts, authFromEnv(provider));
-    const {type, ttl} = opts;
+    const {name, type, ttl, content} = opts;
 
     domains = Array.isArray(domains) ? domains : [domains];
     const aggregated = aggregate(domains, domain => psl.get(domain));
@@ -36,21 +51,21 @@ export class Executor {
 
     const answer = {};
     for (const domain of names) {
-      const p = createProvider(provider, {domain, ...opts}, logger);
-      const executor = Executor.create(p);
-      const items = aggregated[domain].map(name => ({name, type, ttl}));
+      const p = this.createProvider(provider, domain, opts, logger);
+      const executor = Executor.create(p, domain);
+      const items = aggregated[domain].map(full => ({name: name || full, type, ttl, content}));
       answer[domain] = await executor.execute(action, items.length > 1 ? items : items[0]);
     }
     return names.length > 1 ? answer : answer[names[0]];
   }
 
-  static create(provider: Provider): Executor;
+  static create(provider: Provider, domain: string): Executor;
 
-  static create(provider: string, options: ProviderOptions): Executor;
+  static create(provider: string, domain: string, options: ProviderOptions): Executor;
 
-  static create(provider: string | Provider, options?: ProviderOptions): Executor {
+  static create(provider: string | Provider, domain: string, options?: ProviderOptions): Executor {
     if (typeof provider === 'string') {
-      return new this(createProvider(provider, <ProviderOptions>options));
+      return new this(this.createProvider(provider, domain, <ProviderOptions>options));
     }
     return new this(provider);
   }
@@ -123,7 +138,7 @@ export class Executor {
         i = item;
       }
       if (!i.content) {
-        i.content = await ipser.ip();
+        i.content = await iper.ip(Executor.endpoint());
       }
       resolved.push(i);
     }
@@ -135,20 +150,39 @@ export class Executor {
 
 }
 
-export async function execute(action: string, args, opts, logger) {
-  if (opts.conf) {
-    logger.debug('execute with config:', opts.conf);
-    await executeWithConfig(action, args, opts, logger);
-  } else if (args.provider) {
-    logger.debug('execute with provider:', args.provider);
-    await executeWithProvider(action, args, opts, logger);
+export interface ExecuteWithProviderOptions extends ExecutorOptions {
+  provider: string;
+  domains: string | string[];
+}
+
+export interface ExecuteWithConfOptions extends ExecutorOptions {
+  conf: string;
+}
+
+export interface ExecuteWithEntriesOptions extends ExecutorOptions {
+  entries: { [provider: string]: string | string[] };
+}
+
+export async function execute(action: string, opts: ExecuteWithProviderOptions | ExecuteWithConfOptions | ExecuteWithEntriesOptions, logger?: Logger) {
+  if ((<any>opts).provider) {
+    opts = <ExecuteWithProviderOptions>opts;
+    logger && logger.debug('execute with provider:', opts.provider);
+    await executeWithProvider(action, opts, logger);
+  } else if ((<any>opts).conf) {
+    opts = <ExecuteWithConfOptions>opts;
+    logger && logger.debug('execute with config:', opts.conf);
+    await executeWithConfig(action, opts, logger);
+  } else if ((<any>opts).entries) {
+    opts = <ExecuteWithEntriesOptions>opts;
+    logger && logger.debug('execute with entries:', opts.entries);
+    await executeWithEntries(action, opts, logger);
   } else {
     throw new Error('no provider or config file provided');
   }
 }
 
-async function executeWithProvider(action: string, args, opts, logger) {
-  const {provider, domains} = args;
+async function executeWithProvider(action: string, opts: ExecuteWithProviderOptions, logger?: Logger) {
+  const {provider, domains} = opts;
   if (!domains || !domains.length) {
     throw new Error('no domains provided')
   }
@@ -156,7 +190,7 @@ async function executeWithProvider(action: string, args, opts, logger) {
   await Executor.execute(provider, action, domains, opts, logger);
 }
 
-async function executeWithConfig(action: string, args, opts, logger) {
+async function executeWithConfig(action: string, opts: ExecuteWithConfOptions, logger?: Logger) {
   const {conf} = opts;
   const entries = Config.load(conf);
   if (!_.isPlainObject(entries)) {
@@ -168,4 +202,13 @@ async function executeWithConfig(action: string, args, opts, logger) {
     await Executor.execute(provider, action, entries[provider], opts, logger);
   }
 }
+
+async function executeWithEntries(action: string, opts: ExecuteWithEntriesOptions, logger?: Logger) {
+  const {entries} = opts;
+  const providers = Object.keys(entries);
+  for (const provider of providers) if (entries[provider]) {
+    await Executor.execute(provider, action, entries[provider], opts, logger);
+  }
+}
+
 

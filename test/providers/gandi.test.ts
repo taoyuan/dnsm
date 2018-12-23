@@ -5,7 +5,12 @@ import {createProvider} from "../..";
 describe.skip('gandi', function () {
   this.timeout(10000);
 
-  const provider = createProvider('gandi', {token: env['DNM_GANDI_TOKEN'], domain: <string>(env['GANDI_DOMAIN'])});
+  let provider;
+
+  before(() => {
+    provider = createProvider('gandi', <string>(env['GANDI_DOMAIN']), {token: env['DNSM_GANDI_TOKEN']});
+  });
+
 
   it('authenticate', async () => {
     const answer = await provider.authenticate();
@@ -32,7 +37,7 @@ describe.skip('gandi', function () {
     console.log(answer);
   });
 
-  it.only('updyn', async () => {
+  it('updyn', async () => {
     const answer = await provider.updyn('test', {content: '3.3.3.3'});
     console.log(answer);
   });

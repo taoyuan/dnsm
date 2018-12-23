@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import {NotImplementedError} from "./errors";
+import {NotImplementedError, UnknownProvider} from "./errors";
 import {rstrip} from "./utils";
 import {CommandOption} from "./prog";
 import {Logger, nullLogger} from "./logger";
@@ -26,7 +26,6 @@ export interface RecordParams {
 }
 
 export interface ProviderBaseOptions {
-  domain?: string;
   ttl?: number;
 }
 
@@ -53,11 +52,6 @@ const DEFAULTS = {
   ttl: 3600
 };
 
-export interface ProviderConstructor {
-  readonly cliopts: CommandOption[];
-
-  create(opts: ProviderOptions, logger?: Logger): Provider;
-}
 
 export interface Provider {
   readonly name: string;
@@ -82,24 +76,24 @@ export class BaseProvider implements Provider {
 
   readonly logger: Logger;
 
-  constructor(opts: ProviderOptions, logger?: Logger) {
-    assert(opts.domain, 'domain is required');
-    this.logger = logger || nullLogger;
-    // @ts-ignore
-    this._domain = opts.domain.toLowerCase();
-    this._opts = _.defaults(opts, DEFAULTS);
-  }
-
   protected _domain: string;
+
+  protected _opts: ProviderOptions;
 
   get domain() {
     return this._domain;
   }
 
-  protected _opts: ProviderOptions;
-
   get opts() {
     return this._opts;
+  }
+
+  constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
+    assert(domain, 'domain is required');
+    this.logger = logger || nullLogger;
+    // @ts-ignore
+    this._domain = domain.toLowerCase();
+    this._opts = _.defaults(opts, DEFAULTS);
   }
 
   async authenticate(): Promise<any> {
@@ -126,11 +120,11 @@ export class BaseProvider implements Provider {
     throw new NotImplementedError();
   }
 
-  protected _fqdn(name: string): string {
-    return this._full(name);
+  protected fqdn(name: string): string {
+    return this.full(name);
   }
 
-  protected _full(name: string): string {
+  protected full(name: string): string {
     name = rstrip(name, '.');
     if (!name.endsWith(this.domain)) {
       return `${name}.${this.domain}`;
@@ -138,7 +132,7 @@ export class BaseProvider implements Provider {
     return name;
   }
 
-  protected _relative(name: string | any): string {
+  protected relative(name: string | any): string {
     if (name == null) {
       return '';
     }
@@ -148,4 +142,27 @@ export class BaseProvider implements Provider {
     }
     return name;
   }
+}
+
+export interface ProviderConstructor {
+  readonly cliopts?: CommandOption[];
+  new(domain: string, opts: ProviderOptions, logger?: Logger): Provider;
+}
+
+export interface ProviderFactory {
+
+}
+
+export const providers: { [name: string]: ProviderConstructor } = {};
+
+export function registerProvider(name: string, ctor: ProviderConstructor) {
+  providers[name] = ctor;
+}
+
+export function createProvider(provider: string, domain: string, opts: ProviderOptions, logger?: Logger): Provider {
+  const ProviderClass: ProviderConstructor = providers[provider];
+  if (ProviderClass) {
+    return new ProviderClass(domain, opts, logger);
+  }
+  throw new UnknownProvider(provider);
 }

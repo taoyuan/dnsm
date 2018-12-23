@@ -29,7 +29,8 @@ export function updyn(argv) {
     .option('-S, --secret', 'Specify the auth secret for some provider')
     .action(async function (args, opts, logger: Logger) {
       try {
-        await execute('updyn', args, opts, logger);
+        // @ts-ignore
+        await execute('updyn', {...args, ...opts}, logger);
       } catch (e) {
         handleError(e, logger);
       }

@@ -23,8 +23,8 @@ export = class GandiProvider extends BaseProvider {
   readonly name: string = 'gandi';
   protected api;
 
-  constructor(opts: ProviderOptions, logger?: Logger) {
-    super(opts, logger);
+  constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
+    super(domain, opts, logger);
 
     assert(opts.token, 'token is required');
 
@@ -43,10 +43,6 @@ export = class GandiProvider extends BaseProvider {
     return this.opts.token;
   }
 
-  static create(opts: ProviderOptions, logger?: Logger): GandiProvider {
-    return new this(opts, logger);
-  }
-
   async authenticate(): Promise<any> {
     const paths = ['domains', this.domain];
     try {
@@ -62,7 +58,7 @@ export = class GandiProvider extends BaseProvider {
     const records = await this.list(params);
     const current = records.map(r => r.content);
     if (!current || !current.includes(params.content)) {
-      const name = this._relative(params.name) || '@';
+      const name = this.relative(params.name) || '@';
       const paths = ['domains', this.domain, 'records', name];
       const record: GandiRecord = <GandiRecord>{};
       record.rrset_type = params.type;
@@ -90,7 +86,7 @@ export = class GandiProvider extends BaseProvider {
     const filterToUse: RecordFilter = filter || {};
     const paths = ['domains', this.domain];
     paths.push('records');
-    const name = this._relative(filterToUse.name);
+    const name = this.relative(filterToUse.name);
     if (name) {
       paths.push(name);
       if (filterToUse.type) {
@@ -112,7 +108,7 @@ export = class GandiProvider extends BaseProvider {
           const record: Record = {
             id: item.rrset_name,
             type: item.rrset_type,
-            name: this._full(item.rrset_name),
+            name: this.full(item.rrset_name),
             ttl: item.rrset_ttl,
             content: value,
           };
@@ -134,7 +130,7 @@ export = class GandiProvider extends BaseProvider {
   }
 
   async update(identifier: string, params: RecordParams): Promise<any> {
-    const name = this._relative(identifier || params.name) || '@';
+    const name = this.relative(identifier || params.name) || '@';
     const paths = ['domains', this.domain, 'records', name];
 
     const data: GandiRecord = <GandiRecord>{};
@@ -160,7 +156,7 @@ export = class GandiProvider extends BaseProvider {
   }
 
   async delete(identifier: string, params?: RecordFilter): Promise<void> {
-    const name = this._relative(identifier || (params && params.name));
+    const name = this.relative(identifier || (params && params.name));
     const paths = ['domains', this.domain, 'records', name];
     if (!params) {
       const {data: answer} = await this.api.delete(paths.join('/'));

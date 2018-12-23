@@ -1,9 +1,8 @@
+import _ = require('lodash');
 import chalk from "chalk";
 import program = require('caporal');
-import _ = require('lodash');
 import Table = require('easy-table');
-import {ProviderConstructor} from "../provider";
-import {providers} from "../providers";
+import {ProviderConstructor, providers} from "../provider";
 import {authFromEnv} from "../utils";
 import {Executor} from "../executor";
 
@@ -37,7 +36,7 @@ function printUnknownCommand(cmdName) {
   );
 }
 
-function addCommand(name: string, provider: ProviderConstructor) {
+function addCommand(name: string, Provider: ProviderConstructor) {
   const cmd = program
     .command(name, `Manage DNS records that hosted in ${name}`)
     .help(`Manage DNS records that hosted in ${name}`)
@@ -57,7 +56,7 @@ function addCommand(name: string, provider: ProviderConstructor) {
       }
     });
 
-  provider.cliopts && provider.cliopts.forEach(o => {
+  Provider.cliopts && Provider.cliopts.forEach(o => {
     cmd.option(o.synopsis, o.description, o.validator, o.default, o.required);
   });
 }
