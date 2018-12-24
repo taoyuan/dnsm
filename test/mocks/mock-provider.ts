@@ -1,8 +1,4 @@
-import {BaseProvider, RecordData, RecordFilter, RecordParams, Record} from "../..";
-import {Logger} from "../../src/logger";
-import {ProviderOptions} from "../../src";
-
-export type MockProviderRequest = [string, any?]
+import {BaseProvider, RecordData, RecordFilter, RecordParams, Record, Logger, ProviderOptions} from "../../src";
 
 export class MockProvider extends BaseProvider {
 

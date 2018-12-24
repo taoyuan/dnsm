@@ -1,25 +1,24 @@
 import {assert} from "chai";
 import * as sinon from "sinon";
 import * as s from "./support";
-import {execute, registerProvider, Executor} from "../src";
+import {execute, Executor} from "../src";
 import {MockProvider} from "./mocks/mock-provider";
 
 describe('executor', () => {
+
+  let stub;
+  let cache: MockProvider[];
+
   before(() => {
-    registerProvider('mock', MockProvider);
-    stubCreateProvider = sinon.stub(Executor, 'createProvider');
+    stub = sinon.stub(Executor, 'createProvider');
   });
 
   after(() => {
-    stubCreateProvider.reset();
-    stubCreateProvider = null;
+    stub.reset();
   });
 
-  let cache: MockProvider[];
-  let stubCreateProvider;
-
   beforeEach(() => {
-    stubCreateProvider.callsFake(s.buildProviderCreator<MockProvider>(MockProvider, cache = []));
+    stub.callsFake(s.buildProviderCreator(MockProvider, cache = []));
   });
 
   describe('#createWithProvider', () => {
