@@ -166,11 +166,11 @@ export interface ExecuteWithEntriesOptions extends ExecutorOptions {
 export async function execute(action: string, opts: ExecuteWithProviderOptions | ExecuteWithConfOptions | ExecuteWithEntriesOptions, logger?: Logger) {
   if ((<any>opts).provider) {
     opts = <ExecuteWithProviderOptions>opts;
-    logger && logger.debug('execute with provider:', opts.provider);
+    logger && logger.debug(`execute with provider ${opts.provider}`);
     await executeWithProvider(action, opts, logger);
   } else if ((<any>opts).conf) {
     opts = <ExecuteWithConfOptions>opts;
-    logger && logger.debug('execute with config:', opts.conf);
+    logger && logger.debug(`execute with config "${opts.conf}"`);
     await executeWithConfig(action, opts, logger);
   } else if ((<any>opts).entries) {
     opts = <ExecuteWithEntriesOptions>opts;
