@@ -20,13 +20,13 @@ export function updyn(argv) {
     .description('Dynamic update domain ip records')
     .argument('[provider]', 'Specify the dns provider')
     .argument('[domains]', 'Specify the domains to execute, could be list')
-    .option('-t, --type', 'Specify the entry type', ['A', 'AAAA'], 'A')
-    .option('-l, --ttl', 'Specify the record time-to-live', program.INT, 300)
-    .option('-c, --conf', 'Path to the updyn configuration file')
-    .option('-U, --user', 'Specify the auth username for some provider')
-    .option('-P, --pass', 'Specify the auth password for some provider')
-    .option('-T, --token', 'Specify the auth token for some provider')
-    .option('-S, --secret', 'Specify the auth secret for some provider')
+    .option('-t, --type <type>', 'Specify the entry type', ['A', 'AAAA'], 'A')
+    .option('-l, --ttl <ttl>', 'Specify the record time-to-live', program.INT, 300)
+    .option('-c, --conf <conf>', 'Path to the updyn configuration file')
+    .option('-U, --user <user>', 'Specify the auth username for some provider')
+    .option('-P, --pass <pass>', 'Specify the auth password for some provider')
+    .option('-T, --token <token>', 'Specify the auth token for some provider')
+    .option('-S, --secret <secret>', 'Specify the auth secret for some provider')
     .action(async function (args, opts, logger: Logger) {
       try {
         // @ts-ignore

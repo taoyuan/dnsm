@@ -14,14 +14,10 @@ interface CloudflareRequest {
   ttl?: number;
 }
 
-interface CloudflareRecord extends CloudflareRequest {
-  id: string;
-}
-
 export = class CloudflareProvider extends BaseProvider {
   static cliopts: CommandOption[] = [{
     synopsis: '-T, --token',
-    description: 'Specify the gandi api key to authenticate'
+    description: 'Specify the cloudflare api key to authenticate'
   }];
 
   readonly name: string = 'cloudflare';
@@ -48,7 +44,7 @@ export = class CloudflareProvider extends BaseProvider {
     let data;
     try {
       const res = await this.api.get('zones', {params: {name: this.domain, status: 'active'}});
-      this.logger.debug('[gandi] ==> authenticated:', res);
+      this.logger.debug('[cloudflare] ==> authenticated:', res);
       data = res.data;
     } catch (e) {
       raiseRequestError(e);
