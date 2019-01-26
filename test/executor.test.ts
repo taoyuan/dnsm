@@ -86,16 +86,16 @@ describe('executor', () => {
     it('should update with entries', async () => {
       const expectedRequests = [
         ['authenticate'],
-        ['updyn', ['', {
+        ['update', ['', {
           name: 'n1.example.com',
-          type: undefined,
-          ttl: undefined,
+          type: 'A',
+          ttl: 300,
           content: '1.1.1.1'
         }]],
-        ['updyn', ['', {
+        ['update', ['', {
           name: 'n2.example.com',
-          type: undefined,
-          ttl: undefined,
+          type: 'A',
+          ttl: 300,
           content: '1.1.1.1'
         }]]
       ];
