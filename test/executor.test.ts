@@ -82,7 +82,7 @@ describe('executor', () => {
     });
   });
 
-  describe.only('#updyn', () => {
+  describe('#updyn', () => {
     it('should update with entries', async () => {
       const expectedRequests = [
         ['authenticate'],

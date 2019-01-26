@@ -34,16 +34,12 @@ export = class GandiProvider extends BaseProvider {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'X-Api-Key': this.token
+        'X-Api-Key': opts.token
       }
     });
   }
 
-  get token() {
-    return this.opts.token;
-  }
-
-  async authenticate(): Promise<any> {
+  protected async _authenticate(): Promise<any> {
     const paths = ['domains', this.domain];
     try {
       const {data} = await this.api.get(paths.join('/'));
@@ -54,7 +50,7 @@ export = class GandiProvider extends BaseProvider {
     }
   }
 
-  async create(params: RecordData): Promise<void> {
+  protected async _create(params: RecordData): Promise<void> {
     const records = await this.list(params);
     const current = records.map(r => r.content);
     if (!current || !current.includes(params.content)) {
@@ -82,7 +78,8 @@ export = class GandiProvider extends BaseProvider {
     }
   }
 
-  async list(filter?: RecordFilter): Promise<Record[]> {
+  // @ts-ignore
+  protected async _list(filter?: RecordFilter): Promise<Record[]> {
     const filterToUse: RecordFilter = filter || {};
     const paths = ['domains', this.domain];
     paths.push('records');
@@ -125,12 +122,12 @@ export = class GandiProvider extends BaseProvider {
 
       return answer;
     } catch (e) {
-      throw raiseRequestError(e);
+      raiseRequestError(e);
     }
   }
 
-  async update(identifier: string, params: RecordParams): Promise<any> {
-    const name = this.relative(identifier || params.name) || '@';
+  protected async _update(identifier: string, params: RecordParams): Promise<any> {
+    const name = this.relative((params && params.name) || identifier) || '@';
     const paths = ['domains', this.domain, 'records', name];
 
     const data: GandiRecord = <GandiRecord>{};
@@ -155,8 +152,8 @@ export = class GandiProvider extends BaseProvider {
     }
   }
 
-  async delete(identifier: string, params?: RecordFilter): Promise<void> {
-    const name = this.relative(identifier || (params && params.name));
+  protected async _delete(identifier: string, params?: RecordFilter): Promise<void> {
+    const name = this.relative((params && params.name) || identifier);
     const paths = ['domains', this.domain, 'records', name];
     if (!params) {
       const {data: answer} = await this.api.delete(paths.join('/'));
@@ -198,11 +195,6 @@ export = class GandiProvider extends BaseProvider {
     }
   }
 
-  async updyn(identifier: string, params: RecordParams): Promise<void> {
-    params.type = params.type || 'A';
-    params.ttl = params.ttl || 300;
-    return await this.update(identifier, params);
-  }
 }
 
 function raiseRequestError(e: Error) {

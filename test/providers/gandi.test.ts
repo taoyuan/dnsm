@@ -8,9 +8,8 @@ describe.skip('gandi', function () {
   let provider;
 
   before(() => {
-    provider = createProvider('gandi', <string>(env['GANDI_DOMAIN']), {token: env['DNSM_GANDI_TOKEN']});
+    provider = createProvider('gandi', <string>(env['DNSM_DOMAIN']), {token: env['DNSM_GANDI_TOKEN']});
   });
-
 
   it('authenticate', async () => {
     const answer = await provider.authenticate();
@@ -28,17 +27,17 @@ describe.skip('gandi', function () {
   });
 
   it('update', async () => {
-    const answer = await provider.update('test', {type: 'A', content: '2.2.2.2'});
+    const answer = await provider.update({name: 'test', type: 'A', content: '2.2.2.2'});
     console.log(answer);
   });
 
   it('delete', async () => {
-    const answer = await provider.delete('t1');
+    const answer = await provider.delete({name: 't1'});
     console.log(answer);
   });
 
   it('updyn', async () => {
-    const answer = await provider.updyn('test', {content: '3.3.3.3'});
+    const answer = await provider.updyn({name: 'test', content: '3.3.3.3'});
     console.log(answer);
   });
 });

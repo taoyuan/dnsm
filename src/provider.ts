@@ -64,11 +64,15 @@ export interface Provider {
 
   list(filter?: RecordFilter): Promise<Record[]>;
 
-  update(identifier: string, params?: RecordParams): Promise<void>;
+  update(params: RecordParams): Promise<void>;
+  update(identifier: string, params: RecordParams): Promise<void>;
 
+  delete(params: RecordFilter): Promise<void>;
+  delete(identifier: string): Promise<void>;
   delete(identifier: string, params?: RecordFilter): Promise<void>;
 
-  updyn(identifier: string, params?: RecordParams): Promise<void>;
+  updyn(params: RecordParams): Promise<void>;
+  updyn(identifier: string, params: RecordParams): Promise<void>;
 }
 
 export class BaseProvider implements Provider {
@@ -77,11 +81,16 @@ export class BaseProvider implements Provider {
   readonly logger: Logger;
 
   protected _domain: string;
+  protected _domainId?: string;
 
   protected _opts: ProviderOptions;
 
   get domain() {
     return this._domain;
+  }
+
+  get domainId() {
+    return this._domainId;
   }
 
   get opts() {
@@ -96,28 +105,70 @@ export class BaseProvider implements Provider {
     this._opts = _.defaults(opts, DEFAULTS);
   }
 
-  async authenticate(): Promise<any> {
+  protected async _authenticate(): Promise<any> {
     throw new NotImplementedError();
+  }
+
+  protected async _create(params: RecordData): Promise<void> {
+    throw new NotImplementedError();
+  }
+
+  protected async _list(filter?: RecordFilter): Promise<Record[]> {
+    throw new NotImplementedError();
+  }
+
+  protected async _update(identifier: string, params: RecordParams): Promise<void> {
+    throw new NotImplementedError();
+  }
+
+  protected async _delete(identifier: string, params?: RecordFilter): Promise<void> {
+    throw new NotImplementedError();
+  }
+
+  async authenticate(): Promise<any> {
+    return this._authenticate();
   }
 
   async create(params: RecordData): Promise<void> {
-    throw new NotImplementedError();
+    return this._create(params);
   }
 
   async list(filter?: RecordFilter): Promise<Record[]> {
-    throw new NotImplementedError();
+    return this._list(filter);
   }
 
-  async update(identifier: string, params?: RecordParams): Promise<void> {
-    throw new NotImplementedError();
+  async update(params: RecordParams): Promise<void>;
+  async update(identifier: string, params: RecordParams): Promise<void>;
+  async update(identifier: string | RecordParams, params?: RecordParams): Promise<void> {
+    if (typeof identifier === 'string') {
+      return this._update(identifier, <RecordParams>params);
+    } else {
+      return this._update('', <RecordParams>identifier);
+    }
   }
 
-  async delete(identifier: string, params?: RecordFilter): Promise<void> {
-    throw new NotImplementedError();
+  async delete(params: RecordFilter): Promise<void>;
+  async delete(identifier: string): Promise<void>;
+  async delete(identifier: string | RecordFilter, params?: RecordFilter): Promise<void> {
+    if (typeof identifier === 'string') {
+      return this._delete(identifier, params);
+    } else {
+      return this._delete('', identifier);
+    }
+
   }
 
-  async updyn(identifier: string, params: RecordParams): Promise<void> {
-    throw new NotImplementedError();
+  async updyn(params: RecordParams): Promise<void>;
+  async updyn(identifier: string, params: RecordParams): Promise<void>;
+  async updyn(identifier: string | RecordParams, params?: RecordParams): Promise<void> {
+    if (typeof identifier !== 'string') {
+      params = identifier;
+      identifier = '';
+    }
+    params = params || {};
+    params.type = params.type || 'A';
+    params.ttl = params.ttl || 300;
+    return await this.update(identifier, params);
   }
 
   protected fqdn(name: string): string {

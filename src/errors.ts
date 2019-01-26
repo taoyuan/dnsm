@@ -22,9 +22,9 @@ export class RequestError extends Error {
       msg = msg && msg.message;
     }
 
-    // if (data) {
-    //   msg = msg + ':\n==>\n' + JSON.stringify(data, null, '  ') + '\n----';
-    // }
+    if (data) {
+      msg = msg + ':\n==>\n' + JSON.stringify(data, null, '  ') + '\n----';
+    }
 
     super(msg);
     this.data = data;
