@@ -1,15 +1,19 @@
 {
-  "name": "dnsm",
+  "name": "namex",
   "version": "0.2.1",
-  "description": "dnsm",
+  "description": "namex",
   "license": "MIT",
   "repository": "",
   "author": "",
   "keywords": [
+    "name",
+    "naming",
+    "namex",
     "dns",
     "dynamic",
     "ddns",
-    "gandi"
+    "gandi",
+    "cloudflare"
   ],
   "files": [
     "bin",
@@ -18,8 +22,8 @@
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
   "bin": {
-    "dnsm": "bin/dnsm",
-    "dnsu": "bin/dnsu"
+    "nxm": "bin/nxm",
+    "nxu": "bin/nxu"
   },
   "scripts": {
     "clean": "rimraf lib",

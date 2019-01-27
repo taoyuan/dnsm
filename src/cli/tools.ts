@@ -26,7 +26,7 @@
 //         ? chalk.red(`  Unrecognized command '${cmdName}'`)
 //         : chalk.red("  You didn't pass any command"),
 //       `  Run ${chalk.cyan(
-//         'dnsm --help',
+//         'namex --help',
 //       )} to see list of all available commands`,
 //       '',
 //     ].join('\n'),

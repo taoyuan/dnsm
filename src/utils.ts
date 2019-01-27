@@ -37,7 +37,7 @@ export function clearTxtRecord(record: Record) {
   return record;
 }
 
-export function authFromEnv(provider: string, prefixes: string[] = ['DNM', 'DNSM']) {
+export function authFromEnv(provider: string, prefixes: string[] = ['DNS', 'NAMEX']) {
   const answer = {};
 
   for (const prefix of prefixes) {

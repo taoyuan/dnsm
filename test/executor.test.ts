@@ -2,6 +2,8 @@ import {assert} from "chai";
 import * as sinon from "sinon";
 import * as s from "./support";
 import {execute, Executor} from "../src";
+import {FooProvider} from "./mocks/foo-provider";
+import {BarProvider} from "./mocks/bar-provider";
 import {MockProvider} from "./mocks/mock-provider";
 
 describe('executor', () => {
@@ -18,7 +20,10 @@ describe('executor', () => {
   });
 
   beforeEach(() => {
-    stub.callsFake(s.buildProviderCreator(MockProvider, cache = []));
+    stub.callsFake(s.buildProviderCreator({
+      foo: FooProvider,
+      bar: BarProvider
+    }, cache = []));
   });
 
   describe('#createWithProvider', () => {
@@ -32,7 +37,7 @@ describe('executor', () => {
           content: '1.1.1.1'
         }]
       ];
-      await execute('create', {provider: 'mock', domains: 'n1.example.com', content: "1.1.1.1"});
+      await execute('create', {provider: 'foo', domains: 'n1.example.com', content: "1.1.1.1"});
       assert.lengthOf(cache, 1);
       assert.deepEqual(cache[0].domain, 'example.com');
       assert.deepEqual(cache[0].requests, expectedRequests);
@@ -48,7 +53,7 @@ describe('executor', () => {
           content: '1.1.1.1'
         }]
       ];
-      await execute('create', {provider: 'mock', domains: 'example.com', name: 'n1', content: "1.1.1.1"});
+      await execute('create', {provider: 'foo', domains: 'example.com', name: 'n1', content: "1.1.1.1"});
       assert.lengthOf(cache, 1);
       assert.deepEqual(cache[0].domain, 'example.com');
       assert.deepEqual(cache[0].requests, expectedRequests);
@@ -73,7 +78,7 @@ describe('executor', () => {
         }]
       ];
       const entries = {
-        mock: ['n1.example.com', 'n2.example.com']
+        foo: ['n1.example.com', 'n2.example.com']
       };
       await execute('create', {entries, content: "1.1.1.1"});
       assert.lengthOf(cache, 1);
@@ -100,7 +105,7 @@ describe('executor', () => {
         }]]
       ];
       const entries = {
-        mock: ['n1.example.com', 'n2.example.com']
+        foo: ['n1.example.com', 'n2.example.com']
       };
       await execute('updyn', {entries, content: "1.1.1.1"});
       assert.lengthOf(cache, 1);

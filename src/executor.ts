@@ -42,7 +42,7 @@ export class Executor {
   }
 
   static async execute(provider: string, action: string, domains: string | string[], opts: ExecutorOptions, logger?: Logger) {
-    opts = _.defaults(opts, authFromEnv(provider));
+    opts = _.defaults({...opts}, authFromEnv(provider));
     const {name, type, ttl, content} = opts;
 
     domains = Array.isArray(domains) ? domains : [domains];
@@ -196,11 +196,14 @@ async function executeWithConfig(action: string, opts: ExecuteWithConfOptions, l
   if (!_.isPlainObject(entries)) {
     throw new Error(`config content in "${conf}" should be a plain object.`);
   }
-  const providers = Object.keys(entries);
 
-  for (const provider of providers) if (entries[provider]) {
-    await Executor.execute(provider, action, entries[provider], opts, logger);
-  }
+
+  await executeWithEntries(action, {entries, ...opts}, logger);
+  // const providers = Object.keys(entries);
+  //
+  // for (const provider of providers) if (entries[provider]) {
+  //   await Executor.execute(provider, action, entries[provider], opts, logger);
+  // }
 }
 
 async function executeWithEntries(action: string, opts: ExecuteWithEntriesOptions, logger?: Logger) {

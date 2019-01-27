@@ -102,7 +102,7 @@ export class BaseProvider implements Provider {
     this.logger = logger || nullLogger;
     // @ts-ignore
     this._domain = domain.toLowerCase();
-    this._opts = _.defaults(opts, DEFAULTS);
+    this._opts = _.defaults({...opts}, DEFAULTS);
   }
 
   protected async _authenticate(): Promise<any> {

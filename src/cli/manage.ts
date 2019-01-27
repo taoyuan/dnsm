@@ -29,7 +29,7 @@ function printUnknownCommand(cmdName) {
         ? chalk.red(`  Unrecognized command '${cmdName}'`)
         : chalk.red("  You didn't pass any command"),
       `  Run ${chalk.cyan(
-        'dnsm --help',
+        'namex --help',
       )} to see list of all available commands`,
       '',
     ].join('\n'),
@@ -42,12 +42,12 @@ function addCommand(name: string, Provider: ProviderConstructor) {
     .help(`Manage DNS records that hosted in ${name}`)
     .argument('<action>', 'Specify the action to take', ['create', 'list', 'update', 'delete', 'updyn'])
     .argument('<domain>', 'Specify the domain, supports subdomains as well')
-    .option('-n, --name', 'Specify the record name')
-    .option('-t, --type', 'Specify the entry type', ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT', 'SRV', 'LOC'])
-    .option('-d, --content', 'Specify the record content')
-    .option('-l, --ttl', 'Specify the record time-to-live', program.INT)
-    .option('-i, --priority', 'Specify the record priority')
-    .option('-o, --output', 'Specify the output format in table,transposed,json', ['table', 'table-no-header', 'json'])
+    .option('-n, --name <name>', 'Specify the record name')
+    .option('-t, --type <type>', 'Specify the entry type', ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT', 'SRV', 'LOC'])
+    .option('-d, --content <content>', 'Specify the record content')
+    .option('-l, --ttl <ttl>', 'Specify the record time-to-live', program.INT)
+    .option('-i, --priority <priority>', 'Specify the record priority')
+    .option('-o, --output <output>', 'Specify the output format in table,transposed,json', ['table', 'table-no-header', 'json'])
     .action(async function (args, opts, logger) {
       try {
         await runAction(name, args, opts, logger);
@@ -62,7 +62,7 @@ function addCommand(name: string, Provider: ProviderConstructor) {
 }
 
 async function runAction(name: string, args, opts, logger) {
-  opts = _.defaults(opts, authFromEnv(name));
+  opts = _.defaults({...opts}, authFromEnv(name));
   // auto fill name with full domain
   //
   // example: $0 create www.example.com -d 1.1.1.1
