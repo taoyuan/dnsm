@@ -114,6 +114,8 @@ export function manage(argv) {
   const names = Object.keys(providers);
   names.forEach(name => addCommand(name, providers[name]));
 
+  program.description('Manipulate DNS records on various DNS providers in a standardized/agnostic way.');
+
   program.parse(argv);
 
   const isValidCommand = names.includes(process.argv[2]);

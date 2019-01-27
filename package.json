@@ -1,10 +1,10 @@
 {
   "name": "namex",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "namex",
   "license": "MIT",
-  "repository": "",
-  "author": "",
+  "repository": "https://github.com/taoyuan/namex",
+  "author": "Yuan Tao <towyuan@outlook.com>",
   "keywords": [
     "name",
     "naming",
