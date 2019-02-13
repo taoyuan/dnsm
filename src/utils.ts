@@ -66,6 +66,9 @@ export function aggregate(list: any[], key: string | ((item: any) => any)) {
 
   return list.reduce((result, item) => {
     const key = keyFn(item);
+    if (!key) {
+      throw new Error('Invalid item: ' + item + '. Dose it include invalid chars for domain?')
+    }
     if (!result[key]) {
       result[key] = [];
     }

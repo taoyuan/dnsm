@@ -64,7 +64,7 @@ export = class CloudflareProvider extends BaseProvider {
 
   protected async _create(params: RecordData): Promise<any> {
     if (!this.domainId) {
-      throw new Error('authenticate is required');
+      throw new Error(`domain is required. current domain is ${this.domainId}`);
     }
     const data: CloudflareRequest = {
       type: params.type,
@@ -96,7 +96,7 @@ export = class CloudflareProvider extends BaseProvider {
   // @ts-ignore
   protected async _list(filter?: RecordFilter): Promise<Record[]> {
     if (!this.domainId) {
-      throw new Error('authenticate is required');
+      throw new Error(`domain is required. current domain is ${this.domainId}`);
     }
 
     const listFilter: any = {per_page: 100, ...filter};
@@ -116,7 +116,7 @@ export = class CloudflareProvider extends BaseProvider {
 
   protected async _update(identifier: string, params: RecordParams): Promise<any> {
     if (!this.domainId) {
-      throw new Error('authenticate is required');
+      throw new Error(`domain is required. current domain is ${this.domainId}`);
     }
 
     const paramsToUse = {...params};
@@ -153,7 +153,7 @@ export = class CloudflareProvider extends BaseProvider {
 
   protected async _delete(identifier: string, params?: RecordFilter): Promise<any> {
     if (!this.domainId) {
-      throw new Error('authenticate is required');
+      throw new Error(`domain is required. current domain is ${this.domainId}`);
     }
 
     const ids: string[] = [];
