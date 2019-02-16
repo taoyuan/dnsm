@@ -67,9 +67,9 @@ export interface Provider {
   update(params: RecordParams): Promise<void>;
   update(identifier: string, params: RecordParams): Promise<void>;
 
-  delete(params: RecordFilter): Promise<void>;
-  delete(identifier: string): Promise<void>;
-  delete(identifier: string, params?: RecordFilter): Promise<void>;
+  delete(params: RecordFilter): Promise<number>;
+  delete(identifier: string): Promise<number>;
+  delete(identifier: string, params?: RecordFilter): Promise<number>;
 
   updyn(params: RecordParams): Promise<void>;
   updyn(identifier: string, params: RecordParams): Promise<void>;
@@ -121,7 +121,7 @@ export class BaseProvider implements Provider {
     throw new NotImplementedError();
   }
 
-  protected async _delete(identifier: string, params?: RecordFilter): Promise<void> {
+  protected async _delete(identifier: string, params?: RecordFilter): Promise<number> {
     throw new NotImplementedError();
   }
 
@@ -147,9 +147,9 @@ export class BaseProvider implements Provider {
     }
   }
 
-  async delete(params: RecordFilter): Promise<void>;
-  async delete(identifier: string): Promise<void>;
-  async delete(identifier: string | RecordFilter, params?: RecordFilter): Promise<void> {
+  async delete(params: RecordFilter): Promise<number>;
+  async delete(identifier: string): Promise<number>;
+  async delete(identifier: string | RecordFilter, params?: RecordFilter): Promise<number> {
     if (typeof identifier === 'string') {
       return this._delete(identifier, params);
     } else {

@@ -152,7 +152,7 @@ export = class GandiProvider extends BaseProvider {
     }
   }
 
-  protected async _delete(identifier: string, params?: RecordFilter): Promise<void> {
+  protected async _delete(identifier: string, params?: RecordFilter): Promise<number> {
     const name = this.relative((params && params.name) || identifier);
     const paths = ['domains', this.domain, 'records', name];
     if (!params) {
@@ -190,9 +190,7 @@ export = class GandiProvider extends BaseProvider {
       }
     }
 
-    if (!removed) {
-      throw new Error('Record identifier could not be found.')
-    }
+    return removed;
   }
 
 }

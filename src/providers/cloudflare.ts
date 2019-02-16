@@ -151,7 +151,7 @@ export = class CloudflareProvider extends BaseProvider {
     }
   }
 
-  protected async _delete(identifier: string, params?: RecordFilter): Promise<any> {
+  protected async _delete(identifier: string, params?: RecordFilter): Promise<number> {
     if (!this.domainId) {
       throw new Error(`domain is required. current domain is ${this.domainId}`);
     }
@@ -172,10 +172,11 @@ export = class CloudflareProvider extends BaseProvider {
       if (!_.isEmpty(ids)) for (const id of ids) {
         await this.api.delete(`/zones/${this.domainId}/dns_records/${id}`);
       }
-      return true;
+      return ids ? ids.length : 0;
     } catch (e) {
       raiseRequestError(e);
     }
+    return 0;
   }
 }
 
