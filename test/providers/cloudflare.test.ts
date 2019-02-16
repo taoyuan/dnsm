@@ -2,7 +2,7 @@ import {assert} from 'chai';
 import {env} from "../support";
 import {createProvider} from "../..";
 
-describe.only('cloudflare', function () {
+describe.skip('cloudflare', function () {
   this.timeout(10000);
 
   let provider;
