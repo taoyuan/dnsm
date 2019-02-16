@@ -8,7 +8,7 @@ describe.skip('gandi', function () {
   let provider;
 
   before(() => {
-    provider = createProvider('gandi', <string>(env['DNSM_DOMAIN']), {token: env['DNSM_GANDI_TOKEN']});
+    provider = createProvider('gandi', <string>(env['DNS_DOMAIN']), {token: env['DNS_GANDI_TOKEN']});
   });
 
   it('authenticate', async () => {

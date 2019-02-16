@@ -161,7 +161,7 @@ export = class CloudflareProvider extends BaseProvider {
     if (identifier) {
       ids.push(identifier);
     } else {
-      const filter = _.pick(params, ['name', 'type']);
+      const filter = _.pick(params, ['name', 'type', 'content']);
       const records = await this.list(filter);
       ids.push(...records.map(item => item.id));
     }

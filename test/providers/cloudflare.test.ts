@@ -2,15 +2,15 @@ import {assert} from 'chai';
 import {env} from "../support";
 import {createProvider} from "../..";
 
-describe.skip('cloudflare', function () {
+describe.only('cloudflare', function () {
   this.timeout(10000);
 
   let provider;
 
   before(() => {
-    provider = createProvider('cloudflare', <string>(env['DNSM_DOMAIN']), {
-      user: env['DNSM_CLOUDFLARE_USER'],
-      token: env['DNSM_CLOUDFLARE_TOKEN']
+    provider = createProvider('cloudflare', <string>(env['DNS_DOMAIN']), {
+      user: env['DNS_CLOUDFLARE_USER'],
+      token: env['DNS_CLOUDFLARE_TOKEN']
     });
   });
 
@@ -26,14 +26,18 @@ describe.skip('cloudflare', function () {
     before(async () => provider.authenticate());
 
     it('create', async () => {
-      const answer = await provider.create({name: 't1', type: 'A', content: '1.1.1.2'});
+      const answer = await provider.create({name: '_test', type: 'A', content: '1.1.1.2'});
       console.log(answer);
     });
 
     it('list', async () => {
-      const answer = await provider.list({name: 't1'});
+      await provider.create({name: '_list', type: 'A', content: '1.2.3.4'});
+      let answer = await provider.list({name: '_list'});
       assert.lengthOf(answer, 1);
-      console.log(answer);
+      answer = await provider.list({name: '_list', content: '1.2.3.4'});
+      assert.lengthOf(answer, 1);
+      answer = await provider.list({name: '_list', content: '1.1.1.1'});
+      assert.lengthOf(answer, 0);
     });
 
     it('list with unknown name', async () => {
@@ -43,7 +47,7 @@ describe.skip('cloudflare', function () {
     });
 
     it('update', async () => {
-      const answer = await provider.update({name: 't1', type: 'A', content: '2.2.2.2'});
+      const answer = await provider.update({name: '_test', type: 'A', content: '2.2.2.2'});
       console.log(answer);
     });
 
@@ -53,12 +57,12 @@ describe.skip('cloudflare', function () {
     });
 
     it('delete', async () => {
-      const answer = await provider.delete({name: 't1'});
+      const answer = await provider.delete({name: '_test'});
       console.log(answer);
     });
 
     it('updyn', async () => {
-      const answer = await provider.updyn({name: 'test', content: '3.3.3.3'});
+      const answer = await provider.updyn({name: '_updyn', content: '3.3.3.3'});
       console.log(answer);
     });
   });
