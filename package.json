@@ -1,6 +1,6 @@
 {
   "name": "namex",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "namex",
   "license": "MIT",
   "repository": "https://github.com/taoyuan/namex",
@@ -40,7 +40,7 @@
     "easy-table": "^1.1.1",
     "ipily": "^1.0.0",
     "isobject": "^3.0.1",
-    "js-yaml": "^3.12.1",
+    "js-yaml": "^3.12.2",
     "json5": "^2.1.0",
     "lodash": "^4.17.11",
     "logs": "^1.4.1",
@@ -49,22 +49,22 @@
   "devDependencies": {
     "@types/arrify": "^1.0.4",
     "@types/axios": "^0.14.0",
-    "@types/bluebird": "^3.5.25",
+    "@types/bluebird": "^3.5.26",
     "@types/chai": "^4.1.7",
-    "@types/debug": "4.1.1",
+    "@types/debug": "4.1.2",
     "@types/easy-table": "0.0.32",
     "@types/js-yaml": "^3.12.0",
     "@types/json5": "0.0.30",
     "@types/lodash": "^4.14.121",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^11.9.4",
-    "@types/sinon": "^7.0.6",
+    "@types/node": "^11.10.4",
+    "@types/sinon": "^7.0.8",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
+    "mocha": "^6.0.2",
     "rimraf": "^2.6.3",
-    "sinon": "^7.2.3",
+    "sinon": "^7.2.6",
     "ts-node": "^8.0.2",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3333"
   },
   "engines": {
     "node": ">=10.0.0"
