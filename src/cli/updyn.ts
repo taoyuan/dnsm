@@ -1,4 +1,6 @@
-import {Logger} from "../logger";
+import _ = require("lodash");
+import * as logs from "logs";
+import {Logger} from "logs";
 import {execute} from "../executor";
 import program = require('caporal');
 
@@ -27,7 +29,9 @@ export function updyn(argv) {
     .option('-P, --pass <pass>', 'Specify the auth password for some provider')
     .option('-T, --token <token>', 'Specify the auth token for some provider')
     .option('-S, --secret <secret>', 'Specify the auth secret for some provider')
-    .action(async function (args, opts, logger: Logger) {
+    .action(async function (args, opts, log) {
+      const logger = logs.get('updyn');
+      logs.setLevel(_.get(log, 'transports.caporal.level', 'info'));
       try {
         // @ts-ignore
         await execute('updyn', {...args, ...opts}, logger);

@@ -1,4 +1,4 @@
-import {Logger} from "./logger";
+import {Logger} from "logs";
 
 export const INT = 1 << 0;
 export const FLOAT = 1 << 1;

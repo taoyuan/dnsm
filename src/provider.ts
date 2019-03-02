@@ -1,9 +1,10 @@
 import * as assert from "assert";
+import _ = require('lodash');
+import {Logger} from "logs";
+import * as logs from "logs";
 import {NotImplementedError, UnknownProvider} from "./errors";
 import {rstrip} from "./utils";
 import {CommandOption} from "./prog";
-import {Logger, nullLogger} from "./logger";
-import _ = require('lodash');
 
 export interface RecordFilter {
   name?: string;
@@ -65,17 +66,21 @@ export interface Provider {
   list(filter?: RecordFilter): Promise<Record[]>;
 
   update(params: RecordParams): Promise<void>;
+
   update(identifier: string, params: RecordParams): Promise<void>;
 
   delete(params: RecordFilter): Promise<number>;
+
   delete(identifier: string): Promise<number>;
+
   delete(identifier: string, params?: RecordFilter): Promise<number>;
 
   updyn(params: RecordParams): Promise<void>;
+
   updyn(identifier: string, params: RecordParams): Promise<void>;
 }
 
-export class BaseProvider implements Provider {
+export class AbstractProvider implements Provider {
   readonly name: string = 'example';
 
   readonly logger: Logger;
@@ -99,7 +104,7 @@ export class BaseProvider implements Provider {
 
   constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
     assert(domain, 'domain is required');
-    this.logger = logger || nullLogger;
+    this.logger = logger ? logger.extend(this.name) : logs.get(`namex:${this.name}`);
     // @ts-ignore
     this._domain = domain.toLowerCase();
     this._opts = _.defaults({...opts}, DEFAULTS);
@@ -197,11 +202,8 @@ export class BaseProvider implements Provider {
 
 export interface ProviderConstructor {
   readonly cliopts?: CommandOption[];
+
   new(domain: string, opts: ProviderOptions, logger?: Logger): Provider;
-}
-
-export interface ProviderFactory {
-
 }
 
 export const providers: { [name: string]: ProviderConstructor } = {};
@@ -210,8 +212,12 @@ export function registerProvider(name: string, ctor: ProviderConstructor) {
   providers[name] = ctor;
 }
 
+export function findProvider(name): ProviderConstructor | undefined {
+  return providers[name];
+}
+
 export function createProvider(provider: string, domain: string, opts: ProviderOptions, logger?: Logger): Provider {
-  const ProviderClass: ProviderConstructor = providers[provider];
+  const ProviderClass = findProvider(provider);
   if (ProviderClass) {
     return new ProviderClass(domain, opts, logger);
   }

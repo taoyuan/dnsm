@@ -1,6 +1,7 @@
-import {BaseProvider, RecordData, RecordFilter, RecordParams, Record, Logger, ProviderOptions} from "../../src";
+import {Logger} from "logs";
+import {AbstractProvider, RecordData, RecordFilter, RecordParams, Record, ProviderOptions} from "../../src";
 
-export class MockProvider extends BaseProvider {
+export class MockProvider extends AbstractProvider {
 
   requests: any[] = [];
 
@@ -25,8 +26,9 @@ export class MockProvider extends BaseProvider {
     this.requests.push(['update', [identifier, params]]);
   }
 
-  protected async _delete(identifier: string, params?: RecordFilter): Promise<void> {
+  protected async _delete(identifier: string, params?: RecordFilter): Promise<number> {
     this.requests.push(['delete', [identifier, params]]);
+    return 0;
   }
 
 }

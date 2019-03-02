@@ -1,10 +1,11 @@
 import _ = require('lodash');
 import psl = require('psl');
+import {Logger} from "logs";
 import {Provider, ProviderOptions, Record, RecordData, RecordFilter, createProvider} from "./provider";
 import {IPer} from "./iper";
-import {Logger} from "./logger";
 import {aggregate, authFromEnv} from "./utils";
 import {Config} from "./config";
+import arrify = require("arrify");
 
 const iper = new IPer();
 
@@ -118,10 +119,7 @@ export class Executor {
 
   async delete(params: ExecuteParams | ExecuteParams[]): Promise<void> {
     await this._ready;
-    if (!Array.isArray(params)) {
-      return await this._provider.delete(params.identifier || '', params);
-    }
-    params.forEach(async item => await this._provider.delete(item.identifier || '', item));
+    arrify(params).forEach(async item => await this._provider.delete(item.identifier || '', item));
   }
 
   async updyn(items: ExecuteParams[] | string[] | ExecuteParams | string) {

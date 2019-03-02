@@ -1,4 +1,5 @@
 import _ = require('lodash');
+import * as logs from "logs";
 import chalk from "chalk";
 import program = require('caporal');
 import Table = require('easy-table');
@@ -48,7 +49,9 @@ function addCommand(name: string, Provider: ProviderConstructor) {
     .option('-l, --ttl <ttl>', 'Specify the record time-to-live', program.INT)
     .option('-i, --priority <priority>', 'Specify the record priority')
     .option('-o, --output <output>', 'Specify the output format in table,transposed,json', ['table', 'table-no-header', 'json'])
-    .action(async function (args, opts, logger) {
+    .action(async function (args, opts, log) {
+      const logger = logs.get('manage');
+      logs.setLevel(_.get(log, 'transports.caporal.level', 'info'));
       try {
         await runAction(name, args, opts, logger);
       } catch (e) {

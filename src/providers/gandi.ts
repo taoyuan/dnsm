@@ -1,11 +1,11 @@
 import assert = require("assert");
 import axios from 'axios';
 import _ = require('lodash');
-import {BaseProvider, ProviderOptions, Record, RecordData, RecordFilter, RecordParams} from "../provider";
+import {Logger} from "logs";
+import {AbstractProvider, ProviderOptions, Record, RecordData, RecordFilter, RecordParams} from "../provider";
 import {clearTxtRecord} from "../utils";
 import {RequestError} from "../errors";
 import {CommandOption} from "../prog";
-import {Logger} from "../logger";
 
 interface GandiRecord {
   rrset_type: string;
@@ -14,7 +14,7 @@ interface GandiRecord {
   rrset_values: string[];
 }
 
-export = class GandiProvider extends BaseProvider {
+export = class GandiProvider extends AbstractProvider {
   static cliopts: CommandOption[] = [{
     synopsis: '-T, --token',
     description: 'Specify the gandi api key to authenticate'

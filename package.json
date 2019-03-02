@@ -31,6 +31,7 @@
     "test": "npm run build && mocha -r ts-node/register --recursive 'test/**/*.test.ts'"
   },
   "dependencies": {
+    "arrify": "^1.0.1",
     "axios": "^0.18.0",
     "bluebird": "^3.5.3",
     "caporal": "^1.1.0",
@@ -42,9 +43,11 @@
     "js-yaml": "^3.12.1",
     "json5": "^2.1.0",
     "lodash": "^4.17.11",
+    "logs": "^1.4.1",
     "psl": "github:taoyuan/psl"
   },
   "devDependencies": {
+    "@types/arrify": "^1.0.4",
     "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.25",
     "@types/chai": "^4.1.7",

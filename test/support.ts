@@ -1,4 +1,5 @@
-import {Provider, ProviderOptions, Logger} from "../src";
+import {Logger} from "logs";
+import {Provider, ProviderOptions} from "../src";
 
 export const env = process.env;
 

@@ -1,9 +1,9 @@
 import assert = require("assert");
 import axios from 'axios';
 import _ = require('lodash');
-import {BaseProvider, ProviderOptions, Record, RecordData, RecordFilter, RecordParams} from "../provider";
+import {Logger} from "logs";
 
-import {Logger} from "../logger";
+import {AbstractProvider, ProviderOptions, Record, RecordData, RecordFilter, RecordParams} from "../provider";
 import {CommandOption} from "../prog";
 import {RequestError} from "../errors";
 
@@ -14,7 +14,7 @@ interface CloudflareRequest {
   ttl?: number;
 }
 
-export = class CloudflareProvider extends BaseProvider {
+export = class CloudflareProvider extends AbstractProvider {
   static cliopts: CommandOption[] = [{
     synopsis: '-T, --token',
     description: 'Specify the cloudflare api key to authenticate'
