@@ -82,7 +82,7 @@ export interface Provider {
 }
 
 export class AbstractProvider implements Provider {
-  readonly name: string = 'example';
+  readonly name: string;
 
   readonly logger: Logger;
 
@@ -103,10 +103,12 @@ export class AbstractProvider implements Provider {
     return this._opts;
   }
 
-  constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
-    assert(domain, 'domain is required');
+  constructor(name: string, domain: string, opts: ProviderOptions, logger?: Logger) {
+    assert(name, '`name` is required');
+    assert(domain, '`domain` is required');
+    this.name = name;
     // @ts-ignore
-    this._domain = psl.get(domain.toLowerCase());;
+    this._domain = psl.get(domain.toLowerCase());
     this._opts = _.defaults({...opts}, DEFAULTS);
     this.logger = logger ? logger.extend(this.name) : logs.get(`namex:${this.name}`);
   }

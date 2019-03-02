@@ -20,11 +20,10 @@ export = class CloudflareProvider extends AbstractProvider {
     description: 'Specify the cloudflare api key to authenticate'
   }];
 
-  readonly name: string = 'cloudflare';
   protected api;
 
   constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
-    super(domain, opts, logger);
+    super('cloudflare', domain, opts, logger);
 
     assert(opts.user, 'user is required');
     assert(opts.token, 'token is required');
@@ -44,7 +43,7 @@ export = class CloudflareProvider extends AbstractProvider {
     let data;
     try {
       const res = await this.api.get('zones', {params: {name: this.domain, status: 'active'}});
-      this.logger.debug('[cloudflare] ==> authenticated:', res);
+      this.logger.debug('[cloudflare] ==> authenticated:', res.data);
       data = res.data;
     } catch (e) {
       raiseRequestError(e);

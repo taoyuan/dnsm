@@ -20,11 +20,10 @@ export = class GandiProvider extends AbstractProvider {
     description: 'Specify the gandi api key to authenticate'
   }];
 
-  readonly name: string = 'gandi';
   protected api;
 
   constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
-    super(domain, opts, logger);
+    super('gandi', domain, opts, logger);
 
     assert(opts.token, 'token is required');
 
