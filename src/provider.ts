@@ -2,6 +2,7 @@ import * as assert from "assert";
 import _ = require('lodash');
 import {Logger} from "logs";
 import * as logs from "logs";
+import psl = require('psl');
 import {NotImplementedError, UnknownProvider} from "./errors";
 import {rstrip} from "./utils";
 import {CommandOption} from "./prog";
@@ -104,10 +105,10 @@ export class AbstractProvider implements Provider {
 
   constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
     assert(domain, 'domain is required');
-    this.logger = logger ? logger.extend(this.name) : logs.get(`namex:${this.name}`);
     // @ts-ignore
-    this._domain = domain.toLowerCase();
+    this._domain = psl.get(domain.toLowerCase());;
     this._opts = _.defaults({...opts}, DEFAULTS);
+    this.logger = logger ? logger.extend(this.name) : logs.get(`namex:${this.name}`);
   }
 
   protected async _authenticate(): Promise<any> {

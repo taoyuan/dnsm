@@ -1,20 +1,57 @@
-import ipily = require('ipily');
+import _ = require('lodash');
+import exip = require("external-ip");
+import {promisify} from "util";
 
-export class IPer {
-  _ttl: number;
-  _ip: string;
-  _timestamp: number;
+const DEFAULT_SERVICES = ["http://ifconfig.io/ip", "http://me.gandi.net", "https://api.ipify.org"];
 
-  constructor(ttl?: number) {
-    this._ttl = ttl || 60;
+export interface IperOptions {
+  replace?: boolean;
+  services?: string[];
+  timeout?: number;
+  mode?: "parallel" | "sequential";
+  ua?: string;
+  ttl?: number;
+}
+
+export class Iper {
+  protected ttl: number;
+  protected address: string;
+  protected timestamp: number;
+  protected fetchip: () => Promise<string>;
+
+  static create(opts?: IperOptions) {
+    return new Iper(opts);
   }
 
-  async ip(uri?: string) {
-    if (this._ip && (Date.now() - this._timestamp) < this._ttl) {
-      return this._ip;
+  static async retrieve(opts?: IperOptions) {
+    return await this.create(opts).retrieve();
+  }
+
+  constructor(opts?: IperOptions) {
+    opts = opts || {};
+    this.ttl = opts.ttl || 60;
+
+    this.fetchip = promisify(exip(_.defaults({
+      replace: opts.replace,
+      services: opts.services,
+      timeout: opts.timeout,
+      getIP: opts.mode,
+      userAgent: opts.ua
+    }, {
+      replace: true,
+      services: DEFAULT_SERVICES,
+      timeout: 1000,
+      getIP: "parallel",
+      userAgent: "Chrome 71.0.3578 / Mac OS X 10.14.2"
+    })));
+  }
+
+  async retrieve() {
+    if (this.address && (Date.now() - this.timestamp) < this.ttl) {
+      return this.address;
     }
-    this._ip = await ipily(uri);
-    this._timestamp = Date.now();
-    return this._ip;
+    this.address = await this.fetchip();
+    this.timestamp = Date.now();
+    return this.address;
   }
 }

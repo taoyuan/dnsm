@@ -2,12 +2,12 @@ import _ = require('lodash');
 import psl = require('psl');
 import {Logger} from "logs";
 import {Provider, ProviderOptions, Record, RecordData, RecordFilter, createProvider} from "./provider";
-import {IPer} from "./iper";
+import {Iper} from "./iper";
 import {aggregate, authFromEnv} from "./utils";
 import {Config} from "./config";
 import arrify = require("arrify");
 
-const iper = new IPer();
+const iper = new Iper();
 
 export type ExecutorOptions = ProviderOptions & ExecuteParams;
 
@@ -20,21 +20,12 @@ export interface ExecuteParams {
 }
 
 export class Executor {
-  static _endpoint: string;
-
   protected _provider: Provider;
   protected _ready: Promise<void>;
 
   constructor(provider: Provider) {
     this._provider = provider;
     this._ready = provider.authenticate();
-  }
-
-  static endpoint(endpoint?: string) {
-    if (endpoint !== undefined) {
-      this._endpoint = endpoint;
-    }
-    return this._endpoint;
   }
 
   // for test
@@ -111,10 +102,9 @@ export class Executor {
 
   async update(params: ExecuteParams | ExecuteParams[]): Promise<void> {
     await this._ready;
-    if (!Array.isArray(params)) {
-      return await this._provider.update(params.identifier || '', params);
+    for (const item of arrify(params) ) {
+      await this._provider.update(item.identifier || '', item);
     }
-    params.forEach(async item => await this._provider.update(item.identifier || '', item));
   }
 
   async delete(params: ExecuteParams | ExecuteParams[]): Promise<void> {
@@ -124,11 +114,11 @@ export class Executor {
 
   async updyn(items: ExecuteParams[] | string[] | ExecuteParams | string) {
     await this._ready;
-    const arritems = Array.isArray(items) ? items : [items];
+    const itemsToUse = Array.isArray(items) ? items : arrify(items);
     // normalize and resolve items
     let resolved: ExecuteParams[] = [];
     // @ts-ignore
-    for (const item of arritems) {
+    for (const item of itemsToUse) {
       let i: ExecuteParams;
       if (typeof item === 'string') {
         i = {name: item, content: ''};
@@ -136,7 +126,7 @@ export class Executor {
         i = item;
       }
       if (!i.content) {
-        i.content = await iper.ip(Executor.endpoint());
+        i.content = await iper.retrieve();
       }
       resolved.push(i);
     }
@@ -197,11 +187,6 @@ async function executeWithConfig(action: string, opts: ExecuteWithConfOptions, l
 
 
   await executeWithEntries(action, {entries, ...opts}, logger);
-  // const providers = Object.keys(entries);
-  //
-  // for (const provider of providers) if (entries[provider]) {
-  //   await Executor.execute(provider, action, entries[provider], opts, logger);
-  // }
 }
 
 async function executeWithEntries(action: string, opts: ExecuteWithEntriesOptions, logger?: Logger) {

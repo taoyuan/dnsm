@@ -5,73 +5,12 @@
 ## Installation
 
 ```bash
-npm i namex -g
+npm i namex
 ```
 
 ## Usage
 
-### nxm
-
-```bash
-$ nxm -h
-
-   nxm 0.2.1
-
-   USAGE
-
-     nxm <command> [options]
-
-   COMMANDS
-
-     gandi <action> <domain>           Manage DNS records that hosted in gandi
-     cloudflare <action> <domain>      Manage DNS records that hosted in cloudflare
-     help <command>                    Display help for a specific command
-
-   GLOBAL OPTIONS
-
-     -h, --help         Display help
-     -V, --version      Display version
-     --no-color         Disable colors
-     --quiet            Quiet mode - only displays warn and error messages
-     -v, --verbose      Verbose mode - will also output debug messages
-```
-
-### nxu
-
-```bash
-$ nxu -h
-
-   nxu 0.2.1 - Dynamic update domain ip records
-
-   USAGE
-
-     nxu [provider] [domains]
-
-   ARGUMENTS
-
-     [provider]      Specify the dns provider                           optional
-     [domains]       Specify the domains to execute, could be list      optional
-
-   OPTIONS
-
-     -t, --type <type>          Specify the entry type                           optional      default: "A"
-     -l, --ttl <ttl>            Specify the record time-to-live                  optional      default: 300
-     -c, --conf <conf>          Path to the updyn configuration file             optional
-     -U, --user <user>          Specify the auth username for some provider      optional
-     -P, --pass <pass>          Specify the auth password for some provider      optional
-     -T, --token <token>        Specify the auth token for some provider         optional
-     -S, --secret <secret>      Specify the auth secret for some provider        optional
-
-   GLOBAL OPTIONS
-
-     -h, --help         Display help
-     -V, --version      Display version
-     --no-color         Disable colors
-     --quiet            Quiet mode - only displays warn and error messages
-     -v, --verbose      Verbose mode - will also output debug messages
-```
-
-
+__TBD__
 
 ## Reference
 

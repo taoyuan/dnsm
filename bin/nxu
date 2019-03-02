@@ -1,3 +1,0 @@
-#!/usr/bin/env node
-
-require('..').cli.updyn(process.argv);

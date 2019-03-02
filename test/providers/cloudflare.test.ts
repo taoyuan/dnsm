@@ -8,7 +8,7 @@ describe.skip('cloudflare', function () {
   let provider;
 
   before(() => {
-    provider = createProvider('cloudflare', <string>(env['DNS_DOMAIN']), {
+    provider = createProvider('cloudflare', <string>(env['DNS_CLOUDFLARE_DOMAIN']), {
       user: env['DNS_CLOUDFLARE_USER'],
       token: env['DNS_CLOUDFLARE_TOKEN']
     });
@@ -66,7 +66,6 @@ describe.skip('cloudflare', function () {
       console.log(answer);
     });
   });
-
 
 });
 
