@@ -1,11 +1,12 @@
 import _ = require('lodash');
+import PromiseA = require("bluebird");
 import psl = require('psl');
 import {Logger} from "logs";
+import arrify = require("arrify");
 import {Provider, ProviderOptions, Record, RecordData, RecordFilter, createProvider} from "./provider";
 import {Iper} from "./iper";
 import {aggregate, authFromEnv} from "./utils";
 import {Config} from "./config";
-import arrify = require("arrify");
 
 const iper = new Iper();
 
@@ -23,18 +24,18 @@ export class Executor {
   protected _provider: Provider;
   protected _ready: Promise<void>;
 
-  constructor(provider: Provider) {
+  constructor(provider: Provider, logger?: Logger) {
     this._provider = provider;
     this._ready = provider.authenticate();
   }
 
   // for test
   static createProvider(provider: string, domain: string, opts: ProviderOptions, logger?: Logger): Provider {
-    return createProvider(provider, domain, opts, logger);
+    opts = _.defaults({...opts}, authFromEnv(provider));
+    return createProvider(provider, psl.get(domain), opts, logger);
   }
 
   static async execute(provider: string, action: string, domains: string | string[], opts: ExecutorOptions, logger?: Logger) {
-    opts = _.defaults({...opts}, authFromEnv(provider));
     const {name, type, ttl, content} = opts;
 
     domains = Array.isArray(domains) ? domains : [domains];
@@ -44,22 +45,22 @@ export class Executor {
     const answer = {};
     for (const domain of names) {
       const p = this.createProvider(provider, domain, opts, logger);
-      const executor = Executor.create(p, domain);
+      const executor = Executor.create(p, logger);
       const items = aggregated[domain].map(full => ({name: name || full, type, ttl, content}));
       answer[domain] = await executor.execute(action, items.length > 1 ? items : items[0]);
     }
     return names.length > 1 ? answer : answer[names[0]];
   }
 
-  static create(provider: Provider, domain: string): Executor;
+  static create(provider: Provider, logger?: Logger): Executor;
 
-  static create(provider: string, domain: string, options: ProviderOptions): Executor;
+  static create(provider: string, domain: string, options: ProviderOptions, logger?: Logger): Executor;
 
-  static create(provider: string | Provider, domain: string, options?: ProviderOptions): Executor {
+  static create(provider: string | Provider, domain?: string | Logger, options?: ProviderOptions, logger?: Logger): Executor {
     if (typeof provider === 'string') {
-      return new this(this.createProvider(provider, domain, <ProviderOptions>options));
+      return new this(this.createProvider(provider, <string>domain, <ProviderOptions>options, logger), logger);
     }
-    return new this(provider);
+    return new this(provider, <Logger>domain);
   }
 
   async execute(action: string, params: ExecuteParams | ExecuteParams[]) {
@@ -102,14 +103,21 @@ export class Executor {
 
   async update(params: ExecuteParams | ExecuteParams[]): Promise<void> {
     await this._ready;
-    for (const item of arrify(params) ) {
+    for (const item of arrify(params)) {
       await this._provider.update(item.identifier || '', item);
     }
   }
 
-  async delete(params: ExecuteParams | ExecuteParams[]): Promise<void> {
+  async delete(params: ExecuteParams): Promise<number>;
+  async delete(params: ExecuteParams[]): Promise<number[]>;
+  async delete(params: ExecuteParams | ExecuteParams[]): Promise<number | number[]>;
+  async delete(params: ExecuteParams | ExecuteParams[]): Promise<number | number[]> {
     await this._ready;
-    arrify(params).forEach(async item => await this._provider.delete(item.identifier || '', item));
+    if (Array.isArray(params)) {
+      return PromiseA.map(params, item => this._provider.delete(item.identifier || '', item));
+    } else {
+      return await this._provider.delete(params.identifier || '', params);
+    }
   }
 
   async updyn(items: ExecuteParams[] | string[] | ExecuteParams | string) {
