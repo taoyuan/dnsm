@@ -1,5 +1,7 @@
 # namex
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/taoyuan/namex.svg)](https://greenkeeper.io/)
+
 > Manipulate DNS records on various DNS providers(only `gandi` for now) in a standardized/agnostic way for nodejs.
 
 ## Installation
