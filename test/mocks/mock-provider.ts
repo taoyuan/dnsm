@@ -6,7 +6,7 @@ export class MockProvider extends AbstractProvider {
   requests: any[] = [];
 
   constructor(domain: string, opts: ProviderOptions, logger?: Logger) {
-    super(domain, opts, logger);
+    super('mock', domain, opts, logger);
   }
 
   protected async _authenticate(): Promise<any> {

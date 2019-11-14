@@ -164,7 +164,7 @@ export = class GandiProvider extends AbstractProvider {
     const records = await this.list({type: params.type, name});
 
     // rearrange records by type
-    const typed = {}, types = new Set();
+    const typed = {}, types: Set<string> = new Set();
     records.forEach(r => {
       if (!typed[r.type]) {
         typed[r.type] = [];
